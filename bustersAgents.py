@@ -144,6 +144,15 @@ class GreedyBustersAgent(BustersAgent):
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
 
+    def arg_min(self, maze_distances):
+        min_arg = None
+
+        for action in maze_distances:
+            if maze_distances[action] == min(maze_distances.values()):
+                min_arg = action
+
+        return min_arg
+
     def chooseAction(self, gameState):
         """
         First computes the most likely position of each ghost that has
@@ -157,3 +166,23 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i + 1]]
         "*** YOUR CODE HERE ***"
+        most_likely_ghost_positions = []
+        for i in range(len(livingGhosts)):
+            if livingGhosts[i]:
+                most_likely_ghost_positions.append(livingGhostPositionDistributions
+                                                   [(i - 1) % len(livingGhostPositionDistributions)]
+                                                   .argMax())
+
+        ghost_distances = {}
+        for most_likely_ghost_position in most_likely_ghost_positions:
+            ghost_distances[most_likely_ghost_position] = self.distancer.getDistance(pacmanPosition,
+                                                                                     most_likely_ghost_position)
+
+        nearest_ghost = self.arg_min(ghost_distances)
+        maze_distances = {}
+        for action in legal:
+            successor_position = Actions.getSuccessor(pacmanPosition, action)
+            maze_distances[action] = self.distancer.getDistance(successor_position,
+                                                                nearest_ghost)
+
+        return self.arg_min(maze_distances)
