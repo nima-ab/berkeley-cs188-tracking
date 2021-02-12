@@ -534,17 +534,21 @@ class JointParticleFilter(ParticleFilter):
         Sample each particle's next state based on its current state and the
         gameState.
         """
-        newParticles = []
-        for oldParticle in self.particles:
-            newParticle = list(oldParticle)  # A list of ghost positions
+        new_particles = []
+
+        for old_particle in self.particles:
+            new_particle = list(old_particle)  # A list of ghost positions
 
             # now loop through and update each entry in newParticle...
             "*** YOUR CODE HERE ***"
-            raiseNotDefined()
+            for i in range(len(new_particle)):
+                new_pos_dist = self.getPositionDistribution(gameState, old_particle, i, self.ghostAgents[i])
+                new_particle[i] = new_pos_dist.sample()
 
             """*** END YOUR CODE HERE ***"""
-            newParticles.append(tuple(newParticle))
-        self.particles = newParticles
+            new_particles.append(tuple(new_particle))
+
+        self.particles = new_particles
 
 
 # One JointInference module is shared globally across instances of MarginalInference
